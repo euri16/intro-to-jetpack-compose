@@ -11,6 +11,8 @@ class CoinStatsRepositoryImpl (
 ) : CoinStatsRepository {
 
     override suspend fun getCoins(limit: Int, currency: String): List<Coin> {
-        TODO("Fetch the coins")
+        return api.getCoins(limit, currency).coins.map {
+            coinMapper.toEntity(it)
+        }
     }
 }

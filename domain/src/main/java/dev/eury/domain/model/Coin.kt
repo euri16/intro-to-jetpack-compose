@@ -5,6 +5,7 @@ data class Coin(
     val icon: String?,
     val name: String,
     val rank: Int,
+    val symbol: String,
     val price: Double,
     val priceBtc: Float,
     val priceChange1d: Double,

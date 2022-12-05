@@ -9,6 +9,7 @@ class CoinMapper {
         icon = dto.icon,
         name = dto.name,
         rank = dto.rank,
+        symbol = dto.symbol,
         price = dto.price,
         priceBtc = dto.priceBtc,
         priceChange1h = dto.priceChange1h,
