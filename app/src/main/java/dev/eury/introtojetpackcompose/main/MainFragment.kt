@@ -13,12 +13,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -39,8 +42,12 @@ import coil.compose.rememberAsyncImagePainter
 import dev.eury.introtojetpackcompose.ui.theme.Blue200
 import dev.eury.introtojetpackcompose.ui.theme.IntroToJetpackComposeTheme
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.sp
 import dev.eury.domain.model.Coin
-import dev.eury.introtojetpackcompose.ui.theme.TextStyles
+import dev.eury.introtojetpackcompose.ui.theme.bigTextField
+import dev.eury.introtojetpackcompose.utils.roundTo
 
 class MainFragment : Fragment() {
 
@@ -57,46 +64,85 @@ class MainFragment : Fragment() {
         }
     }
 
-    // TODO [1]: Create the Screen Composable
     @Composable
     fun CoinListScreen(viewModel: MainViewModel) {
         val state by viewModel.viewState
-        var value: String by remember { mutableStateOf("") }
+
+        var value: String by remember { mutableStateOf("0") }
 
         Column(
-            modifier = Modifier.padding(10.dp)
+            verticalArrangement = Arrangement.spacedBy((-60).dp)
         ) {
+            NumericTextField(value = value, onUpdateValue = { value = it })
 
-            Column(
-                modifier = Modifier
-                    .background(color = Blue200)
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                Row {
-                    Text("$",
-                        style = TextStyles.bigTextField
-                    )
-                    BasicTextField(
-                        modifier = Modifier.width(IntrinsicSize.Min),
-                        value = value,
-                        textStyle = TextStyles.bigTextField,
-                        onValueChange = {
-                            value = it
-                        }
-                    )
-                }
-            }
-
-            CoinList(coins = state)
+            CoinList(coins = state.coins, inputInUSD = value.toInt())
         }
     }
 
-    // TODO [2]: Create the Item Composable
     @Composable
-    fun CoinItem(coin: Coin) {
+    fun NumericTextField(value: String, onUpdateValue: (String) -> Unit) {
+        val pattern = remember { Regex("^\\d+\$") }
+
+        Column(
+            modifier = Modifier
+                .background(color = Blue200)
+                .fillMaxWidth()
+                .height(170.dp)
+                .padding(vertical = 10.dp),
+            verticalArrangement = Arrangement.aligned(Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Insert an amount in USD to convert",
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    color = Color(0xFFCECECE)
+                )
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Row {
+                Text("$", style = MaterialTheme.typography.bigTextField)
+
+                Spacer(modifier = Modifier.width(3.dp))
+
+                BasicTextField(
+                    modifier = Modifier.width(IntrinsicSize.Min),
+                    value = value,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    textStyle = MaterialTheme.typography.bigTextField,
+                    onValueChange = { newString ->
+                        when {
+                            newString.isEmpty() -> onUpdateValue("0")
+                            newString.matches(pattern) -> onUpdateValue(
+                                if (newString == "0") "0" else newString.trimStart('0')
+                            )
+                        }
+                    }
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun CoinList(coins: List<Coin>, inputInUSD: Int) {
+        Card(
+            modifier = Modifier.padding(all = 25.dp),
+            elevation = 4.dp
+        ) {
+            LazyColumn {
+                items(coins, key = { it.id }) { coin ->
+                    CoinItem(coin, inputInUSD = inputInUSD)
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun CoinItem(coin: Coin, inputInUSD: Int) {
+        val totalCoins = (inputInUSD / coin.price).roundTo(2)
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -106,10 +152,7 @@ class MainFragment : Fragment() {
         ) {
             CoinInfo(coin)
 
-            Column {
-                Text(text = "0.1 ETH")
-                Text(text = "0.4 BTC", color = Color(0xFFAFAFAF))
-            }
+            Text(text = "$totalCoins ${coin.symbol}")
         }
     }
 
@@ -136,28 +179,10 @@ class MainFragment : Fragment() {
         }
     }
 
-    @Composable
-    fun CoinList(coins: MainViewModel.ViewState) {
-        Card(
-            modifier = Modifier.padding(vertical = 25.dp),
-            elevation = 4.dp
-        ) {
-            LazyColumn {
-                items(coins, key = { it.id }) { coin ->
-                    CoinItem(coin)
-                }
-            }
-        }
-    }
-
-    // TODO [3]: Create the CoinList Composable & add it to the screen
-
-
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview() {
         IntroToJetpackComposeTheme {
-            //CoinListScreen(emptyList())
         }
     }
 }

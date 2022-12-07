@@ -21,8 +21,7 @@ class MainViewModel : ViewModel() {
     init {
         viewModelScope.launch {
             val coins = repository.getCoins(10, "USD")
-            val amountInput = viewState.value.amountInput.copy()
-            viewState.value = viewState.value.copy(coins = coins, amountInput = )
+            viewState.value = viewState.value.copy(coins = coins)
         }
     }
 
