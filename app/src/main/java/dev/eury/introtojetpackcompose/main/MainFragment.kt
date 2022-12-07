@@ -141,7 +141,9 @@ class MainFragment : Fragment() {
 
     @Composable
     fun CoinItem(coin: Coin, inputInUSD: Int) {
-        val totalCoins = (inputInUSD / coin.price).roundTo(2)
+        val totalCoins = remember(coin, inputInUSD) {
+            (inputInUSD / coin.price).roundTo(2)
+        }
 
         Row(
             modifier = Modifier
