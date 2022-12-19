@@ -87,7 +87,7 @@ class MainFragment : Fragment() {
             modifier = Modifier
                 .background(color = Blue200)
                 .fillMaxWidth()
-                .height(170.dp)
+                .height(190.dp)
                 .padding(vertical = 10.dp),
             verticalArrangement = Arrangement.aligned(Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally

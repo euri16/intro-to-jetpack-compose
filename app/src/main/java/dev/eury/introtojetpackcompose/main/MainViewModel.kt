@@ -28,9 +28,4 @@ class MainViewModel : ViewModel() {
     data class ViewState(
         val coins: List<Coin> = emptyList(),
     )
-
-    data class AmountInput(
-        val amount: Int,
-        val btcPrice: Double
-    )
 }
